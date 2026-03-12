@@ -1,0 +1,11 @@
+CUDA_VISIBLE_DEVICES=4,5,6,7 \
+PROJECT_PATH=/share/project/jiangxin/projects/s3prl \
+PYTHONPATH=$PROJECT_PATH \
+LD_LIBRARY_PATH=/usr/local/cuda/compat/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64 \
+python -m torch.distributed.launch --nproc_per_node=4  --master_port=29500 run_downstream.py \
+-m train \
+-u hubert \
+-d fluent_commands \
+-n HuBERT_Base__IC \
+-o config.downstream_expert.datarc.train_batch_size=8,,config.runner.gradient_accumulate_steps=1
+
