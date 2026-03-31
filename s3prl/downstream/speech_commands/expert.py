@@ -37,6 +37,10 @@ class DownstreamExpert(nn.Module):
 
         model_cls = eval(self.modelrc['select'])
         model_conf = self.modelrc.get(self.modelrc['select'], {})
+        self.dropout = nn.Dropout(p=0.8)
+        self.layernorm = nn.LayerNorm(upstream_dim)
+        # print(f'upstream_dim={upstream_dim}')
+        # exit()
         self.projector = nn.Linear(upstream_dim, self.modelrc['projector_dim'])
         self.model = model_cls(
             input_dim = self.modelrc['projector_dim'],
@@ -99,6 +103,8 @@ class DownstreamExpert(nn.Module):
         device = features[0].device
         features_len = torch.IntTensor([len(feat) for feat in features]).to(device=device)
         features = pad_sequence(features, batch_first=True)
+        features = self.layernorm(features)
+        features = self.dropout(features)
         features = self.projector(features)
         predicted, _ = self.model(features, features_len)
 

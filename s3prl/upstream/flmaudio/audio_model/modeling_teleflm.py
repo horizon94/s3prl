@@ -1802,7 +1802,16 @@ class TeleFLMForCausalLM(TeleFLMPreTrainedModel):
             audio_logits=audio_logis,
             hidden_states=outputs.last_hidden_state
         )
+    def forward_audio(self, transformer_output_states,audio_input_ids):
+        audio_logits = self.aud_output_layers(
+            transformer_output_states,
+            audio_input_ids
+        )
+        # print(f'audio_logits.shape:{audio_logits.shape}')
+        return audio_logits
 
+        # main_hidden_states, # [seq, main_dim]
+        #         audio_token_ids # [seq, 7]
     def compute_loss(
         self,
         logits: torch.FloatTensor,
