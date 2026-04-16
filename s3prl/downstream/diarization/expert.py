@@ -73,6 +73,9 @@ class DownstreamExpert(nn.Module):
         self.modelrc = downstream_expert["modelrc"]
         self.scorerc = downstream_expert["scorerc"]
 
+        self.dropout = nn.Dropout(p=0.3)
+        self.layernorm = nn.LayerNorm(upstream_dim)
+
         self.train_batch_size = self.loaderrc["train_batchsize"]
         self.eval_batch_size = self.loaderrc["eval_batchsize"]
 
@@ -239,6 +242,8 @@ class DownstreamExpert(nn.Module):
         lengths = torch.LongTensor(lengths)
 
         features = pad_sequence(features, batch_first=True)
+        features = self.layernorm(features)
+        features = self.dropout(features)
         labels = pad_sequence(labels, batch_first=True, padding_value=0).to(
             features.device
         )

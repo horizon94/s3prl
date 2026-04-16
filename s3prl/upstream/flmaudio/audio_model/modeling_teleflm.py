@@ -1802,6 +1802,7 @@ class TeleFLMForCausalLM(TeleFLMPreTrainedModel):
             audio_logits=audio_logis,
             hidden_states=outputs.last_hidden_state
         )
+    
     def forward_audio(self, transformer_output_states,audio_input_ids):
         audio_logits = self.aud_output_layers(
             transformer_output_states,

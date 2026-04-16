@@ -29,6 +29,9 @@ class DownstreamExpert(nn.Module):
         self.upstream_dim = upstream_dim
         self.corpus = downstream_expert["corpus"]
 
+        self.dropout = nn.Dropout(p=0.3)
+        self.layernorm = nn.LayerNorm(upstream_dim)
+
         # Text tokenizer
         self.tokenizer = load_text_encoder(**downstream_expert["text"])
 
@@ -72,7 +75,9 @@ class DownstreamExpert(nn.Module):
             batch_first=True,
             padding_value=self.tokenizer.pad_idx,
         ).to(device=device)
-
+        
+        features = self.layernorm(features)
+        features = self.dropout(features)
         features = self.projector(features)
         logits, log_probs_len = self.model(features, features_len)
         log_probs = nn.functional.log_softmax(logits, dim=-1)

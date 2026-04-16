@@ -89,7 +89,9 @@ class DownstreamExpert(nn.Module):
             "agg_dim",
             self.modelrc['input_dim']
         )
-        
+        self.dropout = nn.Dropout(p=0.0)
+        self.layernorm = nn.LayerNorm(upstream_dim)
+
         ModelConfig = {
             "input_dim": self.modelrc['input_dim'],
             "agg_dim": agg_dim,
@@ -200,7 +202,9 @@ class DownstreamExpert(nn.Module):
         """
 
         features_pad = pad_sequence(features, batch_first=True)
-        
+        features_pad = self.layernorm(features_pad)
+        features_pad = self.dropout(features_pad)
+
         if self.modelrc['module'] == "XVector":
             # TDNN layers in XVector will decrease the total sequence length by fixed 14
             attention_mask = [torch.ones((feature.shape[0] - 14)) for feature in features]
